@@ -37,9 +37,9 @@ export type TokenTrade = Trade<Token, Token, TradeType>;
 
 // Trading Functions
 
-async function createTrade(): Promise<TokenTrade> {
+export async function createTrade(): Promise<TokenTrade> {
   const poolInfo = await getPoolInfo();
-
+  console.log("Hello Motherfucker");
   const pool = new Pool(
     CurrentConfig.tokens.in,
     CurrentConfig.tokens.out,
@@ -48,15 +48,15 @@ async function createTrade(): Promise<TokenTrade> {
     poolInfo.liquidity.toString(),
     poolInfo.tick
   );
-
+  console.log("Hello Motherfucker2");
   const swapRoute = new Route(
     [pool],
     CurrentConfig.tokens.in,
     CurrentConfig.tokens.out
   );
-
+  console.log("Hello Motherfucker4");
   const amountOut = await getOutputQuote(swapRoute);
-
+  console.log("Hello Motherfucker4");
   const uncheckedTrade = Trade.createUncheckedTrade({
     route: swapRoute,
     inputAmount: CurrencyAmount.fromRawAmount(
@@ -136,7 +136,7 @@ async function getOutputQuote(route: Route<Currency, Currency>) {
     ),
     TradeType.EXACT_INPUT,
     {
-      useQuoterV2: true,
+      useQuoterV2: undefined, // I think we are using quoteV3
     }
   );
 

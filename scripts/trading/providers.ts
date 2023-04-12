@@ -1,145 +1,138 @@
-import { BaseProvider } from '@ethersproject/providers'
-import { BigNumber, ethers, providers } from 'ethers'
+import { BaseProvider } from "@ethersproject/providers";
+import { BigNumber, ethers, providers } from "ethers";
 
-import { CurrentConfig, Environment } from '../config'
-
+import { CurrentConfig, Environment } from "../config";
+import { accountImpersonated } from "./Funding";
 // Single copies of provider and wallet
 const mainnetProvider = new ethers.providers.JsonRpcProvider(
   CurrentConfig.rpc.mainnet
-)
-const wallet = createWallet()
+);
+const wallet = createWallet();
 
-const browserExtensionProvider = createBrowserExtensionProvider()
-let walletExtensionAddress: string | null = null
+// const browserExtensionProvider = createBrowserExtensionProvider();
+let walletExtensionAddress: string | null = null;
 
 // Interfaces
 
 export enum TransactionState {
-  Failed = 'Failed',
-  New = 'New',
-  Rejected = 'Rejected',
-  Sending = 'Sending',
-  Sent = 'Sent',
+  Failed = "Failed",
+  New = "New",
+  Rejected = "Rejected",
+  Sending = "Sending",
+  Sent = "Sent",
 }
 
 // Provider and Wallet Functions
 
 export function getMainnetProvider(): BaseProvider {
-  return mainnetProvider
+  return mainnetProvider;
 }
 
 export function getProvider(): providers.Provider | null {
-  return CurrentConfig.env === Environment.WALLET_EXTENSION
-    ? browserExtensionProvider
-    : wallet.provider
+  return wallet.provider;
 }
 
 export function getWalletAddress(): string | null {
-  return CurrentConfig.env === Environment.WALLET_EXTENSION
-    ? walletExtensionAddress
-    : wallet.address
+  return CurrentConfig.wallet.address; // Fix this
 }
 
 export async function sendTransaction(
   transaction: ethers.providers.TransactionRequest
 ): Promise<TransactionState> {
-  if (CurrentConfig.env === Environment.WALLET_EXTENSION) {
-    return sendTransactionViaExtension(transaction)
-  } else {
-    if (transaction.value) {
-      transaction.value = BigNumber.from(transaction.value)
-    }
-    return sendTransactionViaWallet(transaction)
+  if (transaction.value) {
+    transaction.value = BigNumber.from(transaction.value);
   }
+  return sendTransactionViaWallet(transaction);
 }
 
-export async function connectBrowserExtensionWallet() {
-  if (!window.ethereum) {
-    return null
-  }
+// --- I'm not messing with the frontend yet so i do not need it --
+// export async function connectBrowserExtensionWallet() {
+//   if (!window.ethereum) {
+//     return null;
+//   }
 
-  const { ethereum } = window
-  const provider = new ethers.providers.Web3Provider(ethereum)
-  const accounts = await provider.send('eth_requestAccounts', [])
+//   const { ethereum } = window;
+//   const provider = new ethers.providers.Web3Provider(ethereum);
+//   const accounts = await provider.send("eth_requestAccounts", []);
 
-  if (accounts.length !== 1) {
-    return
-  }
+//   if (accounts.length !== 1) {
+//     return;
+//   }
 
-  walletExtensionAddress = accounts[0]
-  return walletExtensionAddress
-}
+//   walletExtensionAddress = accounts[0];
+//   return walletExtensionAddress;
+// }
 
 // Internal Functionality
 
 function createWallet(): ethers.Wallet {
-  let provider = mainnetProvider
+  let provider = mainnetProvider;
   if (CurrentConfig.env == Environment.LOCAL) {
-    provider = new ethers.providers.JsonRpcProvider(CurrentConfig.rpc.local)
+    provider = new ethers.providers.JsonRpcProvider(CurrentConfig.rpc.local);
   }
-  return new ethers.Wallet(CurrentConfig.wallet.privateKey, provider)
+  return new ethers.Wallet(CurrentConfig.wallet.privateKey, provider);
 }
 
-function createBrowserExtensionProvider(): ethers.providers.Web3Provider | null {
-  try {
-    return new ethers.providers.Web3Provider(window?.ethereum, 'any')
-  } catch (e) {
-    console.log('No Wallet Extension Found')
-    return null
-  }
-}
+// function createBrowserExtensionProvider(): ethers.providers.Web3Provider | null {
+//   try {
+//     return new ethers.providers.Web3Provider(window?.ethereum, "any");
+//   } catch (e) {
+//     console.log("No Wallet Extension Found");
+//     return null;
+//   }
+// }
 
 // Transacting with a wallet extension via a Web3 Provider
-async function sendTransactionViaExtension(
-  transaction: ethers.providers.TransactionRequest
-): Promise<TransactionState> {
-  try {
-    const receipt = await browserExtensionProvider?.send(
-      'eth_sendTransaction',
-      [transaction]
-    )
-    if (receipt) {
-      return TransactionState.Sent
-    } else {
-      return TransactionState.Failed
-    }
-  } catch (e) {
-    console.log(e)
-    return TransactionState.Rejected
-  }
-}
+// async function sendTransactionViaExtension(
+//   transaction: ethers.providers.TransactionRequest
+// ): Promise<TransactionState> {
+//   try {
+//     const receipt = await browserExtensionProvider?.send(
+//       "eth_sendTransaction",
+//       [transaction]
+//     );
+//     if (receipt) {
+//       return TransactionState.Sent;
+//     } else {
+//       return TransactionState.Failed;
+//     }
+//   } catch (e) {
+//     console.log(e);
+//     return TransactionState.Rejected;
+//   }
+// }
 
 async function sendTransactionViaWallet(
   transaction: ethers.providers.TransactionRequest
 ): Promise<TransactionState> {
   if (transaction.value) {
-    transaction.value = BigNumber.from(transaction.value)
+    transaction.value = BigNumber.from(transaction.value);
   }
-  const txRes = await wallet.sendTransaction(transaction)
+  const txRes = await wallet.sendTransaction(transaction);
 
-  let receipt = null
-  const provider = getProvider()
+  let receipt = null;
+  const provider = getProvider();
   if (!provider) {
-    return TransactionState.Failed
+    return TransactionState.Failed;
   }
 
   while (receipt === null) {
     try {
-      receipt = await provider.getTransactionReceipt(txRes.hash)
+      receipt = await provider.getTransactionReceipt(txRes.hash);
 
       if (receipt === null) {
-        continue
+        continue;
       }
     } catch (e) {
-      console.log(`Receipt error:`, e)
-      break
+      console.log(`Receipt error:`, e);
+      break;
     }
   }
 
   // Transaction was successful if status === 1
   if (receipt) {
-    return TransactionState.Sent
+    return TransactionState.Sent;
   } else {
-    return TransactionState.Failed
+    return TransactionState.Failed;
   }
 }

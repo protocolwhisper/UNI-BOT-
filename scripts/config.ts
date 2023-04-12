@@ -2,7 +2,7 @@ import { Token } from "@uniswap/sdk-core";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { load } from "ts-dotenv";
 //import { USDC_TOKEN, WETH_TOKEN } from "./trash/constants";
-import { TOKEN_IN, TOKEN_OUT } from "./constants";
+import { TOKEN_IN_INIT, TOKEN_OUT_INIT } from "./constants";
 import { ethers } from "ethers";
 const env = load({
   POOL_FEE: String,
@@ -12,6 +12,7 @@ const env = load({
 export enum Environment {
   LOCAL,
   MAINNET,
+  WALLET_EXTENSION,
 }
 
 // Inputs that configure this example to run
@@ -67,9 +68,9 @@ export const CurrentConfig: ExampleConfig = {
     privateKey: env.PRIVATE_KEY, // Fix Wallet Handle
   },
   tokens: {
-    in: TOKEN_IN,
+    in: TOKEN_IN_INIT,
     amountIn: 1,
-    out: TOKEN_OUT,
+    out: TOKEN_OUT_INIT,
     poolFee: poolFee,
   },
 };
