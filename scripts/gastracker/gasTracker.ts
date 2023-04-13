@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from "axios";
-import { executeQuote } from "../quoting/quote";
 import { load } from "ts-dotenv";
 
 const env = load({
@@ -42,7 +41,6 @@ function trackGasPrice(gastarget: number) {
     if (data.gasPrice !== undefined) {
       if (data.gasPrice >= env.GAS_TARGET) {
         // Executes the trading function
-        executeQuote();
       }
       console.log(typeof data.gasPrice);
     }
