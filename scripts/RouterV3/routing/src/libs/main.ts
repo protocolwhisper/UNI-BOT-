@@ -10,11 +10,12 @@ import {
 } from "./providers";
 import { executeRoute, generateRoute } from "./routing";
 import { SwapRoute } from "@uniswap/smart-order-router";
+import { sendMailChain } from "../../../../mailchain/mailchain";
 
 // Helper function to wait for a given time in milliseconds
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function main() {
+export async function main() {
   // Initialize state
   let tokenInBalance: string | undefined;
   let tokenOutBalance: string | undefined;
@@ -48,6 +49,8 @@ async function main() {
     console.log(
       `Token Out (${CurrentConfig.tokens.out.symbol}) Balance: ${tokenOutBalance}`
     );
+
+    return [tokenInBalance, tokenOutBalance];
   }
   // Create route
   async function createRoute() {
@@ -81,8 +84,15 @@ async function main() {
     if (route) {
       console.log("Executing Swap...");
       await executeSwap(route);
-      await refreshBalances();
-      console.log("Swap Done");
+      const myVariable: string[] | undefined = await refreshBalances();
+      if (myVariable) {
+        console.log("Swap Done");
+        sendMailChain(
+          myVariable[0] as string,
+          myVariable[1] as string,
+          "10wei"
+        );
+      }
     }
 
     // Sleep for 30 seconds before the next iteration

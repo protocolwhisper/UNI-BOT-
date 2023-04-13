@@ -34,13 +34,14 @@ async function fetchGasPrice(): Promise<GasPriceResult> {
   }
 }
 
-function trackGasPrice(gastarget: number) {
+export function trackGasPrice(gastarget: number) {
   // Let's configure the gas variable from the enviroment variable
   fetchGasPrice().then((data) => {
     console.log("Current Ethereum gas price:", data);
     if (data.gasPrice !== undefined) {
-      if (data.gasPrice >= env.GAS_TARGET) {
+      if (data.gasPrice >= gastarget) {
         // Executes the trading function
+        console.log("Hello i'm here");
       }
       console.log(typeof data.gasPrice);
     }
