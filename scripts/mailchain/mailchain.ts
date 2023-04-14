@@ -1,34 +1,26 @@
 import { Mailchain } from "@mailchain/sdk";
+import { load } from "ts-dotenv";
+const env = load({
+  RecoveryPhrasemailchain: String,
+});
 
-const secretRecoveryPhrase =
-  "meat leg thrive disease sibling seek saddle visa secret cement lawn napkin tuition crucial room boss unlock stuff gain repair empty nominee fit perfect"; // 25 word mnemonicPhrase
-
-const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
-
-export async function sendMailChain(
-  gas: string,
-  tokenin: string,
-  tokenout: string
-) {
-  const secretRecoveryPhrase =
-    "meat leg thrive disease sibling seek saddle visa secret cement lawn napkin tuition crucial room boss unlock stuff gain repair empty nominee fit perfect"; // 25 word mnemonicPhrase
-
+export async function sendMailChain(gas: number, balanceout: string) {
+  const secretRecoveryPhrase = env.RecoveryPhrasemailchain;
   const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
   const { data, error } = await mailchain.sendMail({
     from: `uni-bot@mailchain.com`, // sender address
-    to: [`0xB5a962a4b79880796781BF0F347fFDcbA9d21c41@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
-    subject: "Tokens Swapped", // subject line
+    to: [`0xB5a962a4b79880796781BF0F347fFDcbA9d21c41@ethereum.mailchain.com`], // solve this by changing list of recipients (blockchain or mailchain addresses)
+    subject: "Your's token have been swapped :)", // subject line
     content: {
-      text:
-        "Hello from UNI-BOT  , your swap has already been done for" +
-        tokenin +
-        "to" +
-        tokenout +
-        "with a spended gas of" +
-        gas, // plain text body
+      text: "Hello from UNI-BOT  , your swap has already been done",
       html:
-        "<p>Hello" +
+        "<p>Hello  " +
         "0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com" +
+        +"You have swapped 1 WETH" +
+        "for " +
+        balanceout +
+        " with this gas price" +
+        gas.toString() +
         "  👋</p>", // Fix this with analytical
     },
   });
@@ -37,6 +29,10 @@ export async function sendMailChain(
     console.warn("Mailchain error", error);
     return;
   }
-  console.log(data);
+  console.log(
+    "Notification send through mailchain  " +
+      data.sentMailDeliveryRequests[0].deliveryRequestId +
+      "✉️"
+  );
 }
 // handle success send mail result

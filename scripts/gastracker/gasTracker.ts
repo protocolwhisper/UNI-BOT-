@@ -1,6 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import { load } from "ts-dotenv";
-
+import { sendMailChain } from "../mailchain/mailchain";
+import { main } from "../RouterV3/routing/src/libs/main";
+import { refreshBalances } from "../RouterV3/routing/src/libs/main";
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const env = load({
   ETHERSCAN_API_KEY: String,
   GAS_TARGET: Number,
@@ -33,20 +36,29 @@ async function fetchGasPrice(): Promise<GasPriceResult> {
     return { error: "Failed to fetch gas price" };
   }
 }
-
-export function trackGasPrice(gastarget: number) {
-  // Let's configure the gas variable from the enviroment variable
-  fetchGasPrice().then((data) => {
-    console.log("Current Ethereum gas price:", data);
+export async function trackGasPrice(gastarget: number): Promise<number> {
+  // Loop until the gas price is less than or equal to the gas target
+  while (true) {
+    const data = await fetchGasPrice();
     if (data.gasPrice !== undefined) {
-      if (data.gasPrice >= gastarget) {
+      if (data.gasPrice <= gastarget) {
         // Executes the trading function
-        console.log("Hello i'm here");
+        await main();
+        let balanceout = await refreshBalances();
+        if (balanceout != undefined) {
+          sendMailChain(data.gasPrice, balanceout[1]);
+          return 0;
+        } else {
+          // Handle the case when balanceout is undefined, if necessary
+          return 1; // Return a number or any meaningful value as per your use case
+        }
       }
-      console.log(typeof data.gasPrice);
+    } else {
+      // Add an appropriate default return value or handle the error for when data.gasPrice is undefined
+      throw new Error("Gas price is undefined");
     }
-  });
+  }
 }
 
-// Call trackGasPrice every second (1000 milliseconds)
-setInterval(() => trackGasPrice(env.GAS_TARGET), 1000);
+// Call trackGasPrice with the desired gas target
+trackGasPrice(env.GAS_TARGET);

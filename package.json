@@ -1,5 +1,6 @@
 {
   "name": "uni-bot",
+  "license": "MIT",
   "devDependencies": {
     "@ethersproject/providers": "^5.7.2",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
@@ -17,16 +18,20 @@
     "ethers": "^5.4.7",
     "hardhat": "^2.13.0",
     "hardhat-gas-reporter": "^1.0.8",
+    "ora": "3.1.0",
     "solidity-coverage": "^0.8.1",
     "ts-dotenv": "^0.9.1",
     "typechain": "^8.1.0"
   },
   "dependencies": {
     "@mailchain/sdk": "^0.18.4",
+    "@types/figlet": "^1.5.5",
+    "@types/ora": "3.1.0",
     "@uniswap/smart-order-router": "^3.10.4",
     "axios": "^1.3.5",
+    "cli-spinner": "^0.2.10",
     "commander": "^10.0.0",
-    "ora": "^6.3.0"
+    "figlet": "^1.6.0"
   },
   "scripts": {
     "build": "tsc --noEmit ./scripts/CLI/index.ts && esbuild index.ts --bundle --platform=node --format=cjs --outfile=dist/index.js"
