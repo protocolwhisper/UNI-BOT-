@@ -1,7 +1,8 @@
 ## 🦄 UniBot
 UniBot is a simple yet powerful trading bot that tracks gas prices and performs a swap with routing on Uniswap V3 when the gas target is met. Let UniBot save you time and effort by automating your trades! 🚀 UniBot also sends notifications about the completed swaps and gas prices through Mailchain.
-
-Click Me !!!
+<p align="center">
+  <strong>Click the Image !!!</strong>
+</p>
 <p align="center">
   <a href="https://www.youtube.com/watch?v=Ua3HtrrQtJc&ab_channel=CartesianCaramel">
     <img src="https://bafkreidpw6vgjaj4yblf34r5juej3jafjzl5e2wyq56rqblyofdnosjili.ipfs.nftstorage.link/" alt="Video Thumbnail">
