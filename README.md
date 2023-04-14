@@ -4,7 +4,7 @@ UniBot is a simple yet powerful trading bot that tracks gas prices and performs 
   <strong>Click the Image !!!</strong>
 </p>
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=Ua3HtrrQtJc&ab_channel=CartesianCaramel">
+  <a href="https://www.youtube.com/watch?v=-gz_CiwYzt8&ab_channel=protocolwhisper">
     <img src="https://bafkreidpw6vgjaj4yblf34r5juej3jafjzl5e2wyq56rqblyofdnosjili.ipfs.nftstorage.link/" alt="Video Thumbnail">
   </a>
 </p>
